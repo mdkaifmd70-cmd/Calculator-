@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kirana Store Calculator</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f3f5f7;
+  color:#17202a;
+  padding:15px;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+}
+
+.header{
+  background:#17202a;
+  color:white;
+  padding:20px;
+  border-radius:18px;
+  margin-bottom:15px;
+}
+
+.header h1{
+  font-size:25px;
+}
+
+.header p{
+  margin-top:6px;
+  opacity:.8;
+  font-size:14px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:15px;
+  box-shadow:0 3px 15px rgba(0,0,0,.07);
+}
+
+.card h2{
+  font-size:18px;
+  margin-bottom:15px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+
+input,select{
+  width:100%;
+  height:48px;
+  border:1px solid #ccd2d8;
+  border-radius:10px;
+  padding:0 12px;
+  font-size:17px;
+  outline:none;
+  background:white;
+}
+
+input:focus,select:focus{
+  border-color:#17202a;
+}
+
+.mode{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:15px;
+}
+
+.mode button,
+.unit-buttons button,
+.quick button,
+.main-btn,
+.clear-btn{
+  min-height:45px;
+  border:1px solid #ccd2d8;
+  border-radius:10px;
+  background:white;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.mode button.active,
+.unit-buttons button.active,
+.main-btn{
+  background:#17202a;
+  color:white;
+  border-color:#17202a;
+}
+
+.unit-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
+}
+
+.unit-buttons button{
+  padding:0 15px;
+}
+
+.quick{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-top:8px;
+}
+
+.quick button{
+  min-height:42px;
+}
+
+.result-box{
+  margin-top:18px;
+  background:#f0f3f5;
+  border-radius:14px;
+  padding:18px;
+  text-align:center;
+}
+
+.result-title{
+  font-size:13px;
+  color:#69747d;
+}
+
+.result{
+  font-size:34px;
+  font-weight:800;
+  margin-top:5px;
+}
+
+.result-sub{
+  color:#69747d;
+  margin-top:5px;
+  font-size:14px;
+}
+
+.main-btn{
+  width:100%;
+  margin-top:15px;
+}
+
+.bill-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid #e4e7e9;
+}
+
+.bill-name{
+  font-weight:bold;
+}
+
+.bill-value{
+  font-weight:bold;
+}
+
+.total{
+  display:flex;
+  justify-content:space-between;
+  font-size:21px;
+  font-weight:800;
+  padding-top:15px;
+}
+
+.clear-btn{
+  width:100%;
+  margin-top:12px;
+}
+
+.small{
+  color:#69747d;
+  font-size:12px;
+  margin-top:7px;
+}
+
+.hidden{
+  display:none;
+}
+
+@media(max-width:550px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .quick{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .result{
+    font-size:30px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>🛒 Kirana Store Calculator</h1>
+    <p>Gram • Kg • ML • Litre • Piece • Dozen</p>
+  </div>
+
+  <!-- MAIN CALCULATOR -->
+  <div class="card">
+
+    <h2>🧮 Calculation</h2>
+
+    <div class="mode">
+      <button id="quantityMode" class="active">
+        Quantity → ₹
+      </button>
+
+      <button id="moneyMode">
+        ₹ → Quantity
+      </button>
+    </div>
+
+    <div class="grid">
+
+      <div>
+        <label>Item Name</label>
+        <input
+          type="text"
+          id="itemName"
+          placeholder="Example: Jeera"
+        >
+      </div>
+
+      <div>
+        <label>Rate</label>
+        <input
+          type="number"
+          id="rate"
+          min="0"
+          step="0.01"
+          placeholder="Example: 235"
+        >
+      </div>
+
+    </div>
+
+    <div style="margin-top:15px">
+
+      <label>Rate Kis Unit Ke Hisab Se Hai?</label>
+
+      <div class="unit-buttons">
+
+        <button data-rateunit="kg" class="active">
+          ₹ / Kg
+        </button>
+
+        <button data-rateunit="litre">
+          ₹ / Litre
+        </button>
+
+        <button data-rateunit="piece">
+          ₹ / Piece
+        </button>
+
+        <button data-rateunit="dozen">
+          ₹ / Dozen
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- QUANTITY INPUT -->
+
+    <div id="quantitySection" style="margin-top:15px">
+
+      <label id="quantityLabel">
+        Quantity
+      </label>
+
+      <input
+        type="number"
+        id="quantity"
+        min="0"
+        step="0.01"
+        placeholder="Enter quantity"
+      >
+
+      <div class="quick" id="quantityQuick"></div>
+
+    </div>
+
+    <!-- MONEY INPUT -->
+
+    <div
+      id="moneySection"
+      class="hidden"
+      style="margin-top:15px"
+    >
+
+      <label>
+        Customer Ke Kitne ₹ Ka?
+      </label>
+
+      <input
+        type="number"
+        id="money"
+        min="0"
+        step="0.01"
+        placeholder="Example: 50"
+      >
+
+      <div class="quick">
+
+        <button data-money="10">₹10</button>
+        <button data-money="20">₹20</button>
+        <button data-money="50">₹50</button>
+        <button data-money="100">₹100</button>
+        <button data-money="200">₹200</button>
+        <button data-money="500">₹500</button>
+
+      </div>
+
+    </div>
+
+    <div class="result-box">
+
+      <div class="result-title">
+        RESULT
+      </div>
+
+      <div
+        class="result"
+        id="result"
+      >
+        ₹0.00
+      </div>
+
+      <div
+        class="result-sub"
+        id="resultSub"
+      >
+        Rate aur quantity enter karein
+      </div>
+
+    </div>
+
+    <button
+      class="main-btn"
+      id="addToBill"
+    >
+      ➕ Add To Bill
+    </button>
+
+  </div>
+
+
+  <!-- BILL -->
+
+  <div class="card">
+
+    <h2>🧾 Current Bill</h2>
+
+    <div id="billList">
+      <div class="small">
+        Abhi bill mein koi item nahi hai.
+      </div>
+    </div>
+
+    <div class="total">
+
+      <span>Total</span>
+
+      <span id="grandTotal">
+        ₹0.00
+      </span>
+
+    </div>
+
+    <button
+      class="clear-btn"
+      id="clearBill"
+    >
+      🗑 Clear Bill
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+let calculationMode = "quantity";
+
+let rateUnit = "kg";
+
+let grandTotal = 0;
+
+
+/* ELEMENTS */
+
+const rateInput =
+  document.getElementById("rate");
+
+const quantityInput =
+  document.getElementById("quantity");
+
+const moneyInput =
+  document.getElementById("money");
+
+const itemName =
+  document.getElementById("itemName");
+
+const result =
+  document.getElementById("result");
+
+const resultSub =
+  document.getElementById("resultSub");
+
+const quantityLabel =
+  document.getElementById("quantityLabel");
+
+const quantityQuick =
+  document.getElementById("quantityQuick");
+
+const quantitySection =
+  document.getElementById("quantitySection");
+
+const moneySection =
+  document.getElementById("moneySection");
+
+const billList =
+  document.getElementById("billList");
+
+const grandTotalElement =
+  document.getElementById("grandTotal");
+
+
+/* UNIT LABEL */
+
+function getQuantityUnit(){
+
+  if(rateUnit === "kg")
+    return "Gram";
+
+  if(rateUnit === "litre")
+    return "ML";
+
+  if(rateUnit === "piece")
+    return "Piece";
+
+  if(rateUnit === "dozen")
+    return "Piece";
+
+}
+
+
+/* QUICK BUTTONS */
+
+function createQuickButtons(){
+
+  quantityQuick.innerHTML = "";
+
+  let values = [];
+
+  if(rateUnit === "kg"){
+
+    values = [
+      [50,"50g"],
+      [100,"100g"],
+      [200,"200g"],
+      [250,"250g"],
+      [500,"500g"],
+      [1000,"1kg"]
+    ];
+
+  }
+
+  else if(rateUnit === "litre"){
+
+    values = [
+      [50,"50ml"],
+      [100,"100ml"],
+      [250,"250ml"],
+      [500,"500ml"],
+      [750,"750ml"],
+      [1000,"1L"]
+    ];
+
+  }
+
+  else{
+
+    values = [
+      [1,"1"],
+      [2,"2"],
+      [5,"5"],
+      [10,"10"],
+      [12,"1 Dozen"]
+    ];
+
+  }
+
+
+  values.forEach(function(item){
+
+    const button =
+      document.createElement("button");
+
+    button.textContent = item[1];
+
+    button.onclick = function(){
+
+      quantityInput.value = item[0];
+
+      calculate();
+
+    };
+
+    quantityQuick.appendChild(button);
+
+  });
+
+}
+
+
+/* CALCULATE */
+
+function calculate(){
+
+  const rate =
+    parseFloat(rateInput.value) || 0;
+
+
+  if(calculationMode === "quantity"){
+
+    const quantity =
+      parseFloat(quantityInput.value) || 0;
+
+
+    if(rate <= 0 || quantity <= 0){
+
+      result.textContent = "₹0.00";
+
+      resultSub.textContent =
+        "Rate aur quantity enter karein";
+
+      return;
+
+    }
+
+
+    let amount = 0;
+
+
+    if(rateUnit === "kg"){
+
+      /*
+        Rate = ₹ per KG
+        Quantity = Gram
+      */
+
+      amount =
+        rate * quantity / 1000;
+
+    }
+
+
+    else if(rateUnit === "litre"){
+
+      /*
+        Rate = ₹ per Litre
+        Quantity = ML
+      */
+
+      amount =
+        rate * quantity / 1000;
+
+    }
+
+
+    else if(rateUnit === "piece"){
+
+      amount =
+        rate * quantity;
+
+    }
+
+
+    else if(rateUnit === "dozen"){
+
+      amount =
+        rate * quantity / 12;
+
+    }
+
+
+    result.textContent =
+      "₹" + amount.toFixed(2);
+
+
+    resultSub.textContent =
+      quantity +
+      " " +
+      getQuantityUnit() +
+      " = ₹" +
+      amount.toFixed(2);
+
+  }
+
+
+  else{
+
+    const money =
+      parseFloat(moneyInput.value) || 0;
+
+
+    if(rate <= 0 || money <= 0){
+
+      result.textContent = "0";
+
+      resultSub.textContent =
+        "Rate aur ₹ amount enter karein";
+
+      return;
+
+    }
+
+
+    let quantity = 0;
+
+    let unit = "";
+
+
+    if(rateUnit === "kg"){
+
+      quantity =
+        money / rate * 1000;
+
+      unit = "gram";
+
+    }
+
+
+    else if(rateUnit === "litre"){
+
+      quantity =
+        money / rate * 1000;
+
+      unit = "ml";
+
+    }
+
+
+    else if(rateUnit === "piece"){
+
+      quantity =
+        money / rate;
+
+      unit = "piece";
+
+    }
+
+
+    else if(rateUnit === "dozen"){
+
+      quantity =
+        money / rate * 12;
+
+      unit = "piece";
+
+    }
+
+
+    result.textContent =
+      quantity.toFixed(2) +
+      " " +
+      unit;
+
+
+    resultSub.textContent =
+      "₹" +
+      money.toFixed(2) +
+      " ka maal";
+
+  }
+
+}
+
+
+/* QUANTITY MODE */
+
+document
+.getElementById("quantityMode")
+.addEventListener("click",function(){
+
+  calculationMode = "quantity";
+
+  this.classList.add("active");
+
+  document
+  .getElementById("moneyMode")
+  .classList.remove("active");
+
+
+  quantitySection
+  .classList.remove("hidden");
+
+  moneySection
+  .classList.add("hidden");
+
+
+  calculate();
+
+});
+
+
+/* MONEY MODE */
+
+document
+.getElementById("moneyMode")
+.addEventListener("click",function(){
+
+  calculationMode = "money";
+
+  this.classList.add("active");
+
+  document
+  .getElementById("quantityMode")
+  .classList.remove("active");
+
+
+  moneySection
+  .classList.remove("hidden");
+
+  quantitySection
+  .classList.add("hidden");
+
+
+  calculate();
+
+});
+
+
+/* RATE UNIT */
+
+document
+.querySelectorAll("[data-rateunit]")
+.forEach(function(button){
+
+  button.addEventListener("click",function(){
+
+    document
+    .querySelectorAll("[data-rateunit]")
+    .forEach(function(b){
+
+      b.classList.remove("active");
+
+    });
+
+
+    this.classList.add("active");
+
+
+    rateUnit =
+      this.dataset.rateunit;
+
+
+    createQuickButtons();
+
+    calculate();
+
+  });
+
+});
+
+
+/* INPUT EVENTS */
+
+rateInput
+.addEventListener("input",calculate);
+
+quantityInput
+.addEventListener("input",calculate);
+
+moneyInput
+.addEventListener("input",calculate);
+
+
+/* MONEY QUICK BUTTONS */
+
+document
+.querySelectorAll("[data-money]")
+.forEach(function(button){
+
+  button.addEventListener("click",function(){
+
+    moneyInput.value =
+      this.dataset.money;
+
+    calculate();
+
+  });
+
+});
+
+
+/* ADD BILL */
+
+document
+.getElementById("addToBill")
+.addEventListener("click",function(){
+
+  const name =
+    itemName.value.trim() || "Item";
+
+
+  let amount = 0;
+
+
+  if(calculationMode === "quantity"){
+
+    const rate =
+      parseFloat(rateInput.value) || 0;
+
+    const quantity =
+      parseFloat(quantityInput.value) || 0;
+
+
+    if(rate <= 0 || quantity <= 0){
+
+      alert("Rate aur quantity enter karein.");
+
+      return;
+
+    }
+
+
+    if(rateUnit === "kg")
+      amount = rate * quantity / 1000;
+
+    else if(rateUnit === "litre")
+      amount = rate * quantity / 1000;
+
+    else if(rateUnit === "piece")
+      amount = rate * quantity;
+
+    else if(rateUnit === "dozen")
+      amount = rate * quantity / 12;
+
+  }
+
+
+  else{
+
+    amount =
+      parseFloat(moneyInput.value) || 0;
+
+
+    if(amount <= 0){
+
+      alert("Amount enter karein.");
+
+      return;
+
+    }
+
+  }
+
+
+  grandTotal += amount;
+
+
+  if(
+    billList.children.length === 1 &&
+    billList.children[0].classList.contains("small")
+  ){
+
+    billList.innerHTML = "";
+
+  }
+
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "bill-row";
+
+
+  const nameElement =
+    document.createElement("span");
+
+  nameElement.className =
+    "bill-name";
+
+  nameElement.textContent =
+    name;
+
+
+  const amountElement =
+    document.createElement("span");
+
+  amountElement.className =
+    "bill-value";
+
+  amountElement.textContent =
+    "₹" + amount.toFixed(2);
+
+
+  row.appendChild(nameElement);
+
+  row.appendChild(amountElement);
+
+
+  billList.appendChild(row);
+
+
+  grandTotalElement.textContent =
+    "₹" + grandTotal.toFixed(2);
+
+
+  /*
+    Clear current calculation
+    but rate remains
+  */
+
+  quantityInput.value = "";
+
+  moneyInput.value = "";
+
+  result.textContent = "₹0.00";
+
+  resultSub.textContent =
+    "Next item ke liye ready";
+
+});
+
+
+/* CLEAR BILL */
+
+document
+.getElementById("clearBill")
+.addEventListener("click",function(){
+
+  billList.innerHTML =
+    '<div class="small">Abhi bill mein koi item nahi hai.</div>';
+
+  grandTotal = 0;
+
+  grandTotalElement.textContent =
+    "₹0.00";
+
+});
+
+
+/* START */
+
+createQuickButtons();
+
+</script>
+
+</body>
+</html>
