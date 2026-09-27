@@ -3,15 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Kirana Store Calculator</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
   font-family:Arial,Helvetica,sans-serif;
@@ -20,41 +15,28 @@ body{
   padding:15px;
 }
 
-.container{
-  max-width:700px;
-  margin:auto;
-}
+.container{max-width:700px;margin:auto}
 
 .header{
   background:#17202a;
-  color:white;
+  color:#fff;
   padding:20px;
   border-radius:18px;
   margin-bottom:15px;
 }
 
-.header h1{
-  font-size:25px;
-}
-
-.header p{
-  margin-top:6px;
-  opacity:.8;
-  font-size:14px;
-}
+.header h1{font-size:25px}
+.header p{margin-top:6px;opacity:.8;font-size:14px}
 
 .card{
-  background:white;
+  background:#fff;
   border-radius:18px;
   padding:18px;
   margin-bottom:15px;
   box-shadow:0 3px 15px rgba(0,0,0,.07);
 }
 
-.card h2{
-  font-size:18px;
-  margin-bottom:15px;
-}
+.card h2{font-size:18px;margin-bottom:15px}
 
 .grid{
   display:grid;
@@ -77,12 +59,10 @@ input,select{
   padding:0 12px;
   font-size:17px;
   outline:none;
-  background:white;
+  background:#fff;
 }
 
-input:focus,select:focus{
-  border-color:#17202a;
-}
+input:focus,select:focus{border-color:#17202a}
 
 .mode{
   display:grid;
@@ -95,11 +75,13 @@ input:focus,select:focus{
 .unit-buttons button,
 .quick button,
 .main-btn,
-.clear-btn{
+.clear-btn,
+.print-btn,
+.download-btn{
   min-height:45px;
   border:1px solid #ccd2d8;
   border-radius:10px;
-  background:white;
+  background:#fff;
   font-size:15px;
   font-weight:bold;
   cursor:pointer;
@@ -109,7 +91,7 @@ input:focus,select:focus{
 .unit-buttons button.active,
 .main-btn{
   background:#17202a;
-  color:white;
+  color:#fff;
   border-color:#17202a;
 }
 
@@ -120,9 +102,7 @@ input:focus,select:focus{
   margin-top:8px;
 }
 
-.unit-buttons button{
-  padding:0 15px;
-}
+.unit-buttons button{padding:0 15px}
 
 .quick{
   display:grid;
@@ -131,9 +111,7 @@ input:focus,select:focus{
   margin-top:8px;
 }
 
-.quick button{
-  min-height:42px;
-}
+.quick button{min-height:42px}
 
 .result-box{
   margin-top:18px;
@@ -165,20 +143,36 @@ input:focus,select:focus{
   margin-top:15px;
 }
 
-.bill-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 0;
+.bill-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:5px;
+}
+
+.bill-table th,
+.bill-table td{
+  padding:10px 5px;
   border-bottom:1px solid #e4e7e9;
+  text-align:left;
+  font-size:14px;
 }
 
-.bill-name{
-  font-weight:bold;
+.bill-table th:last-child,
+.bill-table td:last-child{
+  text-align:right;
 }
 
-.bill-value{
-  font-weight:bold;
+.bill-table th:nth-child(2),
+.bill-table td:nth-child(2){
+  text-align:center;
+}
+
+.remove-btn{
+  border:0;
+  background:none;
+  cursor:pointer;
+  font-size:18px;
+  padding:4px;
 }
 
 .total{
@@ -189,9 +183,24 @@ input:focus,select:focus{
   padding-top:15px;
 }
 
+.bill-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  margin-top:15px;
+}
+
+.print-btn{
+  background:#17202a;
+  color:#fff;
+}
+
+.download-btn{
+  background:#fff;
+}
+
 .clear-btn{
-  width:100%;
-  margin-top:12px;
+  background:#fff;
 }
 
 .small{
@@ -200,21 +209,52 @@ input:focus,select:focus{
   margin-top:7px;
 }
 
-.hidden{
-  display:none;
-}
+.hidden{display:none}
 
 @media(max-width:550px){
-  .grid{
+  .grid{grid-template-columns:1fr}
+  .quick{grid-template-columns:repeat(3,1fr)}
+  .result{font-size:30px}
+  .bill-table th,.bill-table td{
+    font-size:12px;
+    padding:8px 3px;
+  }
+  .bill-actions{
     grid-template-columns:1fr;
   }
+}
 
-  .quick{
-    grid-template-columns:repeat(3,1fr);
+/* PRINT BILL */
+@media print{
+
+  body{
+    background:#fff;
+    padding:0;
   }
 
-  .result{
-    font-size:30px;
+  body *{
+    visibility:hidden;
+  }
+
+  #printArea,
+  #printArea *{
+    visibility:visible;
+  }
+
+  #printArea{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    padding:20px;
+  }
+
+  .print-hide{
+    display:none !important;
+  }
+
+  .print-title{
+    display:block !important;
   }
 }
 </style>
@@ -224,17 +264,19 @@ input:focus,select:focus{
 
 <div class="container">
 
-  <div class="header">
+  <div class="header print-hide">
     <h1>🛒 Kirana Store Calculator</h1>
     <p>Gram • Kg • ML • Litre • Piece • Dozen</p>
   </div>
 
-  <!-- MAIN CALCULATOR -->
-  <div class="card">
+  <!-- CALCULATOR -->
+
+  <div class="card print-hide">
 
     <h2>🧮 Calculation</h2>
 
     <div class="mode">
+
       <button id="quantityMode" class="active">
         Quantity → ₹
       </button>
@@ -242,6 +284,7 @@ input:focus,select:focus{
       <button id="moneyMode">
         ₹ → Quantity
       </button>
+
     </div>
 
     <div class="grid">
@@ -294,13 +337,11 @@ input:focus,select:focus{
 
     </div>
 
-    <!-- QUANTITY INPUT -->
+    <!-- QUANTITY -->
 
     <div id="quantitySection" style="margin-top:15px">
 
-      <label id="quantityLabel">
-        Quantity
-      </label>
+      <label id="quantityLabel">Quantity</label>
 
       <input
         type="number"
@@ -314,7 +355,7 @@ input:focus,select:focus{
 
     </div>
 
-    <!-- MONEY INPUT -->
+    <!-- MONEY -->
 
     <div
       id="moneySection"
@@ -322,9 +363,7 @@ input:focus,select:focus{
       style="margin-top:15px"
     >
 
-      <label>
-        Customer Ke Kitne ₹ Ka?
-      </label>
+      <label>Customer Ke Kitne ₹ Ka?</label>
 
       <input
         type="number"
@@ -349,30 +388,19 @@ input:focus,select:focus{
 
     <div class="result-box">
 
-      <div class="result-title">
-        RESULT
-      </div>
+      <div class="result-title">RESULT</div>
 
-      <div
-        class="result"
-        id="result"
-      >
+      <div class="result" id="result">
         ₹0.00
       </div>
 
-      <div
-        class="result-sub"
-        id="resultSub"
-      >
+      <div class="result-sub" id="resultSub">
         Rate aur quantity enter karein
       </div>
 
     </div>
 
-    <button
-      class="main-btn"
-      id="addToBill"
-    >
+    <button class="main-btn" id="addToBill">
       ➕ Add To Bill
     </button>
 
@@ -381,19 +409,29 @@ input:focus,select:focus{
 
   <!-- BILL -->
 
-  <div class="card">
+  <div class="card" id="printArea">
 
-    <h2>🧾 Current Bill</h2>
+    <div class="print-title" style="display:none;text-align:center;margin-bottom:18px">
+      <h1>KIRANA STORE</h1>
+      <p>Customer Bill</p>
+      <hr style="margin-top:10px">
+    </div>
+
+    <div class="print-hide">
+      <h2>🧾 Current Bill</h2>
+    </div>
 
     <div id="billList">
+
       <div class="small">
         Abhi bill mein koi item nahi hai.
       </div>
+
     </div>
 
     <div class="total">
 
-      <span>Total</span>
+      <span>Grand Total</span>
 
       <span id="grandTotal">
         ₹0.00
@@ -401,12 +439,21 @@ input:focus,select:focus{
 
     </div>
 
-    <button
-      class="clear-btn"
-      id="clearBill"
-    >
-      🗑 Clear Bill
-    </button>
+    <div class="bill-actions print-hide">
+
+      <button class="print-btn" id="printBill">
+        🖨️ Print Bill
+      </button>
+
+      <button class="download-btn" id="downloadBill">
+        ⬇️ Download
+      </button>
+
+      <button class="clear-btn" id="clearBill">
+        🗑 Clear Bill
+      </button>
+
+    </div>
 
   </div>
 
@@ -416,10 +463,9 @@ input:focus,select:focus{
 <script>
 
 let calculationMode = "quantity";
-
 let rateUnit = "kg";
-
 let grandTotal = 0;
+let billItems = [];
 
 
 /* ELEMENTS */
@@ -442,9 +488,6 @@ const result =
 const resultSub =
   document.getElementById("resultSub");
 
-const quantityLabel =
-  document.getElementById("quantityLabel");
-
 const quantityQuick =
   document.getElementById("quantityQuick");
 
@@ -461,21 +504,21 @@ const grandTotalElement =
   document.getElementById("grandTotal");
 
 
-/* UNIT LABEL */
+/* UNIT */
 
 function getQuantityUnit(){
 
   if(rateUnit === "kg")
-    return "Gram";
+    return "g";
 
   if(rateUnit === "litre")
-    return "ML";
+    return "ml";
 
   if(rateUnit === "piece")
-    return "Piece";
+    return "pcs";
 
   if(rateUnit === "dozen")
-    return "Piece";
+    return "pcs";
 
 }
 
@@ -532,6 +575,8 @@ function createQuickButtons(){
     const button =
       document.createElement("button");
 
+    button.type = "button";
+
     button.textContent = item[1];
 
     button.onclick = function(){
@@ -578,46 +623,17 @@ function calculate(){
     let amount = 0;
 
 
-    if(rateUnit === "kg"){
+    if(rateUnit === "kg")
+      amount = rate * quantity / 1000;
 
-      /*
-        Rate = ₹ per KG
-        Quantity = Gram
-      */
+    else if(rateUnit === "litre")
+      amount = rate * quantity / 1000;
 
-      amount =
-        rate * quantity / 1000;
+    else if(rateUnit === "piece")
+      amount = rate * quantity;
 
-    }
-
-
-    else if(rateUnit === "litre"){
-
-      /*
-        Rate = ₹ per Litre
-        Quantity = ML
-      */
-
-      amount =
-        rate * quantity / 1000;
-
-    }
-
-
-    else if(rateUnit === "piece"){
-
-      amount =
-        rate * quantity;
-
-    }
-
-
-    else if(rateUnit === "dozen"){
-
-      amount =
-        rate * quantity / 12;
-
-    }
+    else if(rateUnit === "dozen")
+      amount = rate * quantity / 12;
 
 
     result.textContent =
@@ -625,8 +641,7 @@ function calculate(){
 
 
     resultSub.textContent =
-      quantity +
-      " " +
+      quantity + " " +
       getQuantityUnit() +
       " = ₹" +
       amount.toFixed(2);
@@ -653,7 +668,6 @@ function calculate(){
 
 
     let quantity = 0;
-
     let unit = "";
 
 
@@ -662,10 +676,9 @@ function calculate(){
       quantity =
         money / rate * 1000;
 
-      unit = "gram";
+      unit = "g";
 
     }
-
 
     else if(rateUnit === "litre"){
 
@@ -676,23 +689,21 @@ function calculate(){
 
     }
 
-
     else if(rateUnit === "piece"){
 
       quantity =
         money / rate;
 
-      unit = "piece";
+      unit = "pcs";
 
     }
-
 
     else if(rateUnit === "dozen"){
 
       quantity =
         money / rate * 12;
 
-      unit = "piece";
+      unit = "pcs";
 
     }
 
@@ -713,7 +724,7 @@ function calculate(){
 }
 
 
-/* QUANTITY MODE */
+/* MODE */
 
 document
 .getElementById("quantityMode")
@@ -727,20 +738,14 @@ document
   .getElementById("moneyMode")
   .classList.remove("active");
 
+  quantitySection.classList.remove("hidden");
 
-  quantitySection
-  .classList.remove("hidden");
-
-  moneySection
-  .classList.add("hidden");
-
+  moneySection.classList.add("hidden");
 
   calculate();
 
 });
 
-
-/* MONEY MODE */
 
 document
 .getElementById("moneyMode")
@@ -754,13 +759,9 @@ document
   .getElementById("quantityMode")
   .classList.remove("active");
 
+  moneySection.classList.remove("hidden");
 
-  moneySection
-  .classList.remove("hidden");
-
-  quantitySection
-  .classList.add("hidden");
-
+  quantitySection.classList.add("hidden");
 
   calculate();
 
@@ -778,18 +779,13 @@ document
     document
     .querySelectorAll("[data-rateunit]")
     .forEach(function(b){
-
       b.classList.remove("active");
-
     });
-
 
     this.classList.add("active");
 
-
     rateUnit =
       this.dataset.rateunit;
-
 
     createQuickButtons();
 
@@ -802,17 +798,12 @@ document
 
 /* INPUT EVENTS */
 
-rateInput
-.addEventListener("input",calculate);
-
-quantityInput
-.addEventListener("input",calculate);
-
-moneyInput
-.addEventListener("input",calculate);
+rateInput.addEventListener("input",calculate);
+quantityInput.addEventListener("input",calculate);
+moneyInput.addEventListener("input",calculate);
 
 
-/* MONEY QUICK BUTTONS */
+/* MONEY QUICK */
 
 document
 .querySelectorAll("[data-money]")
@@ -830,7 +821,121 @@ document
 });
 
 
-/* ADD BILL */
+/* GET CURRENT AMOUNT */
+
+function getCurrentAmount(){
+
+  const rate =
+    parseFloat(rateInput.value) || 0;
+
+
+  if(calculationMode === "money"){
+
+    const money =
+      parseFloat(moneyInput.value) || 0;
+
+    return money;
+
+  }
+
+
+  const quantity =
+    parseFloat(quantityInput.value) || 0;
+
+
+  if(rateUnit === "kg")
+    return rate * quantity / 1000;
+
+  if(rateUnit === "litre")
+    return rate * quantity / 1000;
+
+  if(rateUnit === "piece")
+    return rate * quantity;
+
+  if(rateUnit === "dozen")
+    return rate * quantity / 12;
+
+}
+
+
+/* GET CURRENT QUANTITY TEXT */
+
+function getCurrentQuantity(){
+
+  if(calculationMode === "money"){
+
+    const rate =
+      parseFloat(rateInput.value) || 0;
+
+    const money =
+      parseFloat(moneyInput.value) || 0;
+
+    if(rate <= 0 || money <= 0)
+      return "-";
+
+
+    let q = 0;
+    let unit = "";
+
+
+    if(rateUnit === "kg"){
+
+      q = money / rate * 1000;
+      unit = "g";
+
+    }
+
+    else if(rateUnit === "litre"){
+
+      q = money / rate * 1000;
+      unit = "ml";
+
+    }
+
+    else if(rateUnit === "piece"){
+
+      q = money / rate;
+      unit = "pcs";
+
+    }
+
+    else{
+
+      q = money / rate * 12;
+      unit = "pcs";
+
+    }
+
+
+    return q.toFixed(2) + " " + unit;
+
+  }
+
+
+  const q =
+    parseFloat(quantityInput.value) || 0;
+
+
+  if(!q)
+    return "-";
+
+
+  if(rateUnit === "kg")
+    return q + " g";
+
+  if(rateUnit === "litre")
+    return q + " ml";
+
+  if(rateUnit === "piece")
+    return q + " pcs";
+
+  if(rateUnit === "dozen")
+    return q + " pcs";
+
+}
+
+
+/* ADD TO BILL */
 
 document
 .getElementById("addToBill")
@@ -840,115 +945,64 @@ document
     itemName.value.trim() || "Item";
 
 
-  let amount = 0;
+  const amount =
+    getCurrentAmount();
 
 
-  if(calculationMode === "quantity"){
+  if(!amount || amount <= 0){
 
-    const rate =
-      parseFloat(rateInput.value) || 0;
+    alert("Pehle valid calculation karein.");
 
-    const quantity =
-      parseFloat(quantityInput.value) || 0;
-
-
-    if(rate <= 0 || quantity <= 0){
-
-      alert("Rate aur quantity enter karein.");
-
-      return;
-
-    }
-
-
-    if(rateUnit === "kg")
-      amount = rate * quantity / 1000;
-
-    else if(rateUnit === "litre")
-      amount = rate * quantity / 1000;
-
-    else if(rateUnit === "piece")
-      amount = rate * quantity;
-
-    else if(rateUnit === "dozen")
-      amount = rate * quantity / 12;
+    return;
 
   }
 
 
-  else{
-
-    amount =
-      parseFloat(moneyInput.value) || 0;
+  const quantityText =
+    getCurrentQuantity();
 
 
-    if(amount <= 0){
+  const rate =
+    parseFloat(rateInput.value) || 0;
 
-      alert("Amount enter karein.");
 
-      return;
+  const rateText =
+    "₹" +
+    rate.toFixed(2) +
+    "/" +
+    (
+      rateUnit === "kg"
+      ? "kg"
+      : rateUnit === "litre"
+      ? "L"
+      : rateUnit === "piece"
+      ? "pc"
+      : "doz"
+    );
 
-    }
 
-  }
+  billItems.push({
+
+    name:name,
+
+    quantity:quantityText,
+
+    rate:rateText,
+
+    amount:amount
+
+  });
 
 
   grandTotal += amount;
 
 
-  if(
-    billList.children.length === 1 &&
-    billList.children[0].classList.contains("small")
-  ){
-
-    billList.innerHTML = "";
-
-  }
+  renderBill();
 
 
-  const row =
-    document.createElement("div");
+  /* Clear item fields */
 
-  row.className =
-    "bill-row";
-
-
-  const nameElement =
-    document.createElement("span");
-
-  nameElement.className =
-    "bill-name";
-
-  nameElement.textContent =
-    name;
-
-
-  const amountElement =
-    document.createElement("span");
-
-  amountElement.className =
-    "bill-value";
-
-  amountElement.textContent =
-    "₹" + amount.toFixed(2);
-
-
-  row.appendChild(nameElement);
-
-  row.appendChild(amountElement);
-
-
-  billList.appendChild(row);
-
-
-  grandTotalElement.textContent =
-    "₹" + grandTotal.toFixed(2);
-
-
-  /*
-    Clear current calculation
-    but rate remains
-  */
+  itemName.value = "";
 
   quantityInput.value = "";
 
@@ -962,19 +1016,278 @@ document
 });
 
 
+/* RENDER BILL */
+
+function renderBill(){
+
+  billList.innerHTML = "";
+
+
+  if(billItems.length === 0){
+
+    billList.innerHTML =
+      '<div class="small">Abhi bill mein koi item nahi hai.</div>';
+
+    grandTotalElement.textContent =
+      "₹0.00";
+
+    return;
+
+  }
+
+
+  const table =
+    document.createElement("table");
+
+  table.className =
+    "bill-table";
+
+
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+
+
+  const tbody =
+    table.querySelector("tbody");
+
+
+  billItems.forEach(function(item,index){
+
+    const tr =
+      document.createElement("tr");
+
+
+    const tdName =
+      document.createElement("td");
+
+    tdName.textContent =
+      item.name;
+
+
+    const tdQty =
+      document.createElement("td");
+
+    tdQty.textContent =
+      item.quantity;
+
+
+    const tdAmount =
+      document.createElement("td");
+
+    tdAmount.textContent =
+      "₹" + item.amount.toFixed(2);
+
+
+    const tdRemove =
+      document.createElement("td");
+
+    const remove =
+      document.createElement("button");
+
+    remove.className =
+      "remove-btn print-hide";
+
+    remove.textContent =
+      "✕";
+
+    remove.title =
+      "Remove item";
+
+
+    remove.onclick =
+      function(){
+
+        grandTotal -=
+          billItems[index].amount;
+
+        billItems.splice(index,1);
+
+        renderBill();
+
+      };
+
+
+    tdRemove.appendChild(remove);
+
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdQty);
+    tr.appendChild(tdAmount);
+    tr.appendChild(tdRemove);
+
+
+    tbody.appendChild(tr);
+
+  });
+
+
+  billList.appendChild(table);
+
+
+  grandTotalElement.textContent =
+    "₹" + grandTotal.toFixed(2);
+
+}
+
+
+/* PRINT */
+
+document
+.getElementById("printBill")
+.addEventListener("click",function(){
+
+  if(billItems.length === 0){
+
+    alert("Bill mein koi item nahi hai.");
+
+    return;
+
+  }
+
+
+  window.print();
+
+});
+
+
+/* DOWNLOAD BILL */
+
+document
+.getElementById("downloadBill")
+.addEventListener("click",function(){
+
+  if(billItems.length === 0){
+
+    alert("Bill mein koi item nahi hai.");
+
+    return;
+
+  }
+
+
+  let text = "";
+
+  text +=
+    "================================\n";
+
+  text +=
+    "          KIRANA STORE\n";
+
+  text +=
+    "            BILL\n";
+
+  text +=
+    "================================\n\n";
+
+
+  billItems.forEach(function(item,index){
+
+    text +=
+      (index + 1) +
+      ". " +
+      item.name +
+      "\n";
+
+    text +=
+      "   Qty : " +
+      item.quantity +
+      "\n";
+
+    text +=
+      "   Rate: " +
+      item.rate +
+      "\n";
+
+    text +=
+      "   Amount: ₹" +
+      item.amount.toFixed(2) +
+      "\n";
+
+    text +=
+      "--------------------------------\n";
+
+  });
+
+
+  text += "\n";
+
+  text +=
+    "GRAND TOTAL: ₹" +
+    grandTotal.toFixed(2) +
+    "\n";
+
+  text +=
+    "================================\n";
+
+  text +=
+    "        Thank You\n";
+
+  text +=
+    "================================\n";
+
+
+  const blob =
+    new Blob(
+      [text],
+      {type:"text/plain;charset=utf-8"}
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+
+  a.download =
+    "Kirana-Bill-" +
+    new Date().toISOString()
+    .slice(0,10) +
+    ".txt";
+
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+
+});
+
+
 /* CLEAR BILL */
 
 document
 .getElementById("clearBill")
 .addEventListener("click",function(){
 
-  billList.innerHTML =
-    '<div class="small">Abhi bill mein koi item nahi hai.</div>';
+  if(billItems.length === 0)
+    return;
+
+
+  if(!confirm("Pura bill clear karna hai?"))
+    return;
+
+
+  billItems = [];
 
   grandTotal = 0;
 
-  grandTotalElement.textContent =
-    "₹0.00";
+  renderBill();
 
 });
 
@@ -982,6 +1295,8 @@ document
 /* START */
 
 createQuickButtons();
+
+renderBill();
 
 </script>
 
